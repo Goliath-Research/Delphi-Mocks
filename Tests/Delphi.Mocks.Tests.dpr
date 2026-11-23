@@ -44,6 +44,7 @@ uses
   Delphi.Mocks.Utils.Tests in 'Delphi.Mocks.Utils.Tests.pas',
   Delphi.Mocks.Examples.Matchers in 'Delphi.Mocks.Examples.Matchers.pas',
   Delphi.Mocks.Tests.Stubs in 'Delphi.Mocks.Tests.Stubs.pas';
+  Delphi.Mocks.Tests.WeakReferenceLifetime in 'Delphi.Mocks.Tests.WeakReferenceLifetime.pas';
 
 {$R *.RES}
 
