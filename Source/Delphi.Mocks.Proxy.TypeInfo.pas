@@ -451,6 +451,7 @@ end;
 function TProxy.QueryImplementedInterface(const IID: TGUID; out Obj): HRESULT;
 var
   virtualProxy : IProxy;
+  parentProxy : IProxy;
 begin
   Result := E_NOINTERFACE;
 
@@ -473,7 +474,9 @@ begin
 
     //Call the parent.
     if FParentProxy <> nil then
-      Result := FParentProxy.Data.QueryInterface(IID, obj);
+      parentProxy := FParentProxy.Data;
+    if parentProxy <> nil then
+      Result := parentProxy.QueryInterface(IID, obj);
   finally
     FQueryingInternalInterface := False;
   end;
@@ -725,6 +728,8 @@ begin
 end;
 
 function TProxy.TProxyVirtualInterface.QueryInterfaceWithOwner(const IID: TGUID; out Obj; const ACheckOwner: Boolean): HRESULT;
+var
+  owner : IProxy;
 begin
   //See if we support the passed in interface.
   if IsEqualGUID(IID, IInterface) and not SupportsIInterface then
@@ -738,7 +743,9 @@ begin
   if (ACheckOwner) and (Result <> 0) then
   begin
     if FProxy <> nil then
-      Result := FProxy.Data.QueryImplementedInterface(IID, Obj);
+      owner := FProxy.Data;
+    if owner <> nil then
+      Result := owner.QueryImplementedInterface(IID, Obj);
   end;
 end;
 
@@ -760,9 +767,13 @@ begin
 end;
 
 function TProxy.TProxyVirtualInterface.SupportsIInterface: Boolean;
+var
+  owner : IProxy;
 begin
   if FProxy <> nil then
-    Result := FProxy.Data.SupportsIInterface
+    owner := FProxy.Data;
+  if owner <> nil then
+    Result := owner.SupportsIInterface
   else
     Result := True;
 end;
