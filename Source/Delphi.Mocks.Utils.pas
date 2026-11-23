@@ -90,11 +90,16 @@ end;
 //courtesy of Allen Bauer on stackoverflow
 //http://stackoverflow.com/questions/760513/where-can-i-find-information-on-the-structure-of-the-delphi-vmt
 function GetVirtualMethodCount(AClass: TClass): Integer;
+var
+  classAddr : NativeInt;
+  classNameAddr : NativeInt;
 begin
   //Note that this returns all virtual methods in the class, including those from the base class.
   //Therefore anything that inherits from TObject will have atleast 12 virtual methods already
-  Result := (PInteger(Integer(AClass) + vmtClassName)^ -
-    (Integer(AClass) + vmtParent) - SizeOf(Pointer)) div SizeOf(Pointer);
+  //The class reference and the vmtClassName slot are pointer sized, so they must not pass through Integer on 64-bit targets.
+  classAddr := NativeInt(AClass);
+  classNameAddr := NativeInt(PPointer(classAddr + vmtClassName)^);
+  Result := (classNameAddr - (classAddr + vmtParent) - SizeOf(Pointer)) div SizeOf(Pointer);
 end;
 
 //TODO : There must be a better way than this. How does Default(X) work? Couldn't find the implementation.
